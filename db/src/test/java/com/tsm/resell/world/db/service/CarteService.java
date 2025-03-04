@@ -4,10 +4,13 @@ package com.tsm.resell.world.db.service;
 import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
 import com.tsm.resell.world.db.model.request.inventario.GetInventarioRequest;
+import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
+import com.tsm.resell.world.db.repository.InventarioCarteRepo;
 import com.tsm.resell.world.db.service.acquisti.AddAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.DeleteAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.GetAcquistiService;
 import com.tsm.resell.world.db.service.inventario.GetInventarioCarteService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import java.time.LocalDateTime;
 @SpringBootTest
 public class CarteService {
 
+    // service
     @Autowired
     AddAcquistiService addAcquistiService;
     @Autowired
@@ -28,7 +32,18 @@ public class CarteService {
     @Autowired
     DeleteAcquistiService deleteAcquistiService;
 
+    // repo
+    @Autowired
+    AcquistiCarteRepo acquistiCarteRepo;
+    @Autowired
+    InventarioCarteRepo inventarioCarteRepo;
 
+    // mi ripulisce il db dopo ogni singolo test
+    @AfterEach
+    void tearDown() {
+        acquistiCarteRepo.deleteAll();
+        inventarioCarteRepo.deleteAll();
+    }
 
     @Test
     void addAcquistiTestOK(){

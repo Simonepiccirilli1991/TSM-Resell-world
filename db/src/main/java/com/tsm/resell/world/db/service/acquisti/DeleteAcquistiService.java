@@ -29,13 +29,13 @@ public class DeleteAcquistiService {
 
         var tracingId = (!ObjectUtils.isEmpty(headers.getFirst("tracingId")) ? headers.getFirst("tracingId") : UUID.randomUUID());
         log.info("DeleteAcquistiCarteService started for codiceAcquisto: {} , and tracingId: {}",codiceAcquisto,tracingId);
-
+        // checko se entity esiste
         var entity = acquistiCarteRepo.findByCodiceAcquisto(codiceAcquisto)
                 .orElseThrow( () -> {
                     log.error("Error on deleteAcquistiCarte service , missign entity");
                     return new TsmDbException("Missing entity","04");
                 });
-        // checko se entity esiste
+        // faccio in pallelo, ma non va di default su thread virtuale, imposto io abilitando i thrad virtuali su application yml
         try(var scope = new StructuredTaskScope.ShutdownOnFailure()){
             // deleto acquisto
             scope.fork(() -> {
