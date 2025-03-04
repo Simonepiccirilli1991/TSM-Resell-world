@@ -2,7 +2,12 @@ spring:
   application.name: TSM resell DB
   threads:
     virtual.enabled: true
-    # configuro contexth path su reattivo
+
+  main:
+    web-application-type: reactive
+    profile:
+      active: default
+
     #DB h2 connection
   datasource:
     driver-class-name: org.h2.Driver
