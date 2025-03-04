@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-@Entity(name = "invetarioCarte")
+@Entity(name = "invetario_carte")
 public class InventarioCarte {
 
     @Id
@@ -14,7 +14,9 @@ public class InventarioCarte {
     private Integer id;
     @Column(name = "nomeAcquisto",unique = true,nullable = false)
     private String nomeAcquisto;
+    @Column(name = "quantita_disponibile")
     private Integer quantitaDisponibile;
+    @Column(name = "quantita_vendute")
     private Integer quantitaVendute;
     private List<String> codiciAcquisti;
     private List<String> codiciVendite;

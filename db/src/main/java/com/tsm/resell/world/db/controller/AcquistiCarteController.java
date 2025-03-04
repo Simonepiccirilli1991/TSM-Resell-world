@@ -3,7 +3,7 @@ package com.tsm.resell.world.db.controller;
 import com.tsm.resell.world.db.entity.CarteAcquisto;
 import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
-import com.tsm.resell.world.db.model.request.vendite.GetAcquistiResponse;
+import com.tsm.resell.world.db.model.response.acquisti.GetAcquistiResponse;
 import com.tsm.resell.world.db.service.acquisti.AddAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.GetAcquistiService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class AcquistiCarteController {
     }
 
     @PostMapping("getcarta")
-    public Mono<ResponseEntity<GetAcquistiResponse>> getAcquistiResponse(@RequestBody GetAcquistiRequest request){
-        return Mono.just(ResponseEntity.ok(getAcquistiService.getCarteAcquisto(request)));
+    public Mono<ResponseEntity<GetAcquistiResponse>> getAcquistiResponse(@RequestBody GetAcquistiRequest request, @RequestHeader HttpHeaders headers){
+        return Mono.just(ResponseEntity.ok(getAcquistiService.getCarteAcquisto(request,headers)));
     }
 }

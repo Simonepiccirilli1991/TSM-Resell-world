@@ -2,14 +2,16 @@ package com.tsm.resell.world.db.service.acquisti;
 
 import com.tsm.resell.world.db.entity.CarteAcquisto;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
-import com.tsm.resell.world.db.model.request.vendite.GetAcquistiResponse;
+import com.tsm.resell.world.db.model.response.acquisti.GetAcquistiResponse;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -19,8 +21,9 @@ public class GetAcquistiService {
     private final AcquistiCarteRepo acquistiCarteRepo;
 
 
-    public GetAcquistiResponse getCarteAcquisto(GetAcquistiRequest request){
-        log.info("GetCarteAcquisto service started with request: {}",request);
+    public GetAcquistiResponse getCarteAcquisto(GetAcquistiRequest request, HttpHeaders headers){
+        var tracingId = (!ObjectUtils.isEmpty(headers.getFirst("tracingId")) ? headers.getFirst("tracingId") : UUID.randomUUID());
+        log.info("GetCarteAcquisto service started with request: {} , and TracingId: {}",request,tracingId);
 
         var resp = switch (request){
 

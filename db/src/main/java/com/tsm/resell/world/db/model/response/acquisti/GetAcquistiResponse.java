@@ -1,4 +1,4 @@
-package com.tsm.resell.world.db.model.request.vendite;
+package com.tsm.resell.world.db.model.response.acquisti;
 
 import com.tsm.resell.world.db.entity.CarteAcquisto;
 
