@@ -30,7 +30,12 @@ public class GetInventarioCarteService {
 
             case GetInventarioRequest i when !ObjectUtils.isEmpty(i.nomeAcquisto()) -> {
                 log.info("GetInventarioCarteService filtering for nome acquisto");
-                yield List.of(inventarioCarteRepo.findByNomeAcquisto(i.nomeAcquisto()));
+                var entity = inventarioCarteRepo.findByNomeAcquisto(i.nomeAcquisto());
+
+                if(entity.isPresent())
+                    yield List.of(inventarioCarteRepo.findByNomeAcquisto(i.nomeAcquisto()).get());
+                else
+                    yield List.of();
             }
 
             case GetInventarioRequest i when !ObjectUtils.isEmpty(i.quantitaDisponibile()) -> {

@@ -42,11 +42,11 @@ public class AddAcquistiService {
         var acquistoTrxId = String.valueOf((request.nomeAcquisto() + request.dataAcquisto().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)).hashCode());
         // addo trxId acquisto
         entity.setCodiceAcquisto(acquistoTrxId);
-
+        // lancio su thread virtuale
         try(var scope =  Executors.newVirtualThreadPerTaskExecutor()) {
-            // chiamata su thread virtuale per add inventario
+            // chiamata su thread virtuale per add inventario, l'execute torna sempre void
             scope.execute(() -> addInventario(requestId, request.nomeAcquisto(), acquistoTrxId, request.quantitaAcquistata()));
-            // chiamata a add acquisto carte repo
+            // chiamata a add acquisto carte repo, uso submit perche ho bisogno del valore
             var resp = scope.submit(() -> acquistiCarteRepo.save(entity)).get();
             log.info("AddAcquistoCarte service ended successfully for requestId: {}", resp);
             return resp;
