@@ -3,12 +3,14 @@ package com.tsm.resell.world.db.service;
 
 import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
+import com.tsm.resell.world.db.model.request.acquisti.UpdateAcquistiCarteRequest;
 import com.tsm.resell.world.db.model.request.inventario.GetInventarioRequest;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import com.tsm.resell.world.db.repository.InventarioCarteRepo;
 import com.tsm.resell.world.db.service.acquisti.AddAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.DeleteAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.GetAcquistiService;
+import com.tsm.resell.world.db.service.acquisti.UpdateAcquistiService;
 import com.tsm.resell.world.db.service.inventario.GetInventarioCarteService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -31,6 +33,8 @@ public class CarteService {
     GetInventarioCarteService getInventarioCarteService;
     @Autowired
     DeleteAcquistiService deleteAcquistiService;
+    @Autowired
+    UpdateAcquistiService updateAcquistiService;
 
     // repo
     @Autowired
@@ -119,5 +123,41 @@ public class CarteService {
 
         Assertions.assertEquals(3,iResp2.inventario().getFirst().getQuantitaDisponibile());
         Assertions.assertEquals(1,iResp2.inventario().getFirst().getCodiciAcquisti().size());
+    }
+
+    @Test
+    void updateCartaAcqusitoTestOK(){
+
+        var request = new AddAcquistoCarteRequest("ETB evoluzioni a paldea", LocalDateTime.now().minusHours(1),71.00,3,"Carrefout",
+                "destino sfuggente","pokemon","sealed",false,"evlprsm123");
+
+        var resp = addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+
+        Assertions.assertEquals("ETB evoluzioni a paldea",resp.getNomeAcquisto());
+
+        var iRequest = new GetAcquistiRequest(null, resp.getCodiceAcquisto(), null,null);
+        var iResp = getAcquistiService.getCarteAcquisto(iRequest,new HttpHeaders());
+
+        Assertions.assertEquals(3,iResp.listaAcquisti().getFirst().getQuantitaAcquistata());
+
+        var iRequestF = new GetInventarioRequest(request.nomeAcquisto(),null,null);
+        // ttesto calcolo corretto
+        var iRespF = getInventarioCarteService.getInventarioCarte(iRequestF,new HttpHeaders());
+        Assertions.assertEquals(3,iRespF.inventario().getFirst().getQuantitaDisponibile());
+
+        var updateRequest = new AddAcquistoCarteRequest("ETB evoluzioni a paldea", null,50.00,5,"Carrefour",
+                "evoluzioni a paldea",null,null,null,null);
+
+        // vado di udpate e richecko dopo
+        var iUpdateRequest = new UpdateAcquistiCarteRequest(resp.getCodiceAcquisto(), updateRequest);
+
+        var finalResp = updateAcquistiService.updateCarteAcquisto(iUpdateRequest,new HttpHeaders());
+
+        Assertions.assertEquals(5,finalResp.getQuantitaAcquistata());
+        Assertions.assertEquals(250.00,finalResp.getCostoTotaleAcquisto());
+
+        var finalInventario = getInventarioCarteService.getInventarioCarte(iRequestF,new HttpHeaders());
+
+        Assertions.assertEquals(5,finalInventario.inventario().getFirst().getQuantitaDisponibile());
     }
 }
