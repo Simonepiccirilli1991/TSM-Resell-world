@@ -3,11 +3,13 @@ package com.tsm.resell.world.db.controller;
 import com.tsm.resell.world.db.entity.CarteAcquisto;
 import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
+import com.tsm.resell.world.db.model.request.acquisti.UpdateAcquistiCarteRequest;
 import com.tsm.resell.world.db.model.response.BaseResponse;
 import com.tsm.resell.world.db.model.response.acquisti.GetAcquistiResponse;
 import com.tsm.resell.world.db.service.acquisti.AddAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.DeleteAcquistiService;
 import com.tsm.resell.world.db.service.acquisti.GetAcquistiService;
+import com.tsm.resell.world.db.service.acquisti.UpdateAcquistiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ public class AcquistiCarteController {
     private final AddAcquistiService addAcquistiService;
     private final GetAcquistiService getAcquistiService;
     private final DeleteAcquistiService deleteAcquistiService;
+    private final UpdateAcquistiService updateAcquistiService;
 
 
     @PostMapping("addcarta")
@@ -36,5 +39,10 @@ public class AcquistiCarteController {
     @DeleteMapping("deletecarta/{codiceAcquisto}")
     public Mono<ResponseEntity<BaseResponse>> delteCartaAcquisto(@PathVariable ("codiceAcquisto") String codiceAcquisto, @RequestHeader HttpHeaders headers){
         return Mono.just(ResponseEntity.ok(deleteAcquistiService.deleteAcquistoCarte(codiceAcquisto,headers)));
+    }
+
+    @PatchMapping("updatecarta")
+    public Mono<ResponseEntity<CarteAcquisto>> udpateCartaAcquisto(@RequestBody UpdateAcquistiCarteRequest request,@RequestHeader HttpHeaders headers){
+        return Mono.just(ResponseEntity.ok(updateAcquistiService.updateCarteAcquisto(request, headers)));
     }
 }
