@@ -1,6 +1,7 @@
 package com.tsm.resell.world.db.service;
 
 
+import com.tsm.resell.world.db.exception.TsmDbException;
 import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
 import com.tsm.resell.world.db.model.request.acquisti.UpdateAcquistiCarteRequest;
@@ -159,5 +160,23 @@ public class CarteService {
         var finalInventario = getInventarioCarteService.getInventarioCarte(iRequestF,new HttpHeaders());
 
         Assertions.assertEquals(5,finalInventario.inventario().getFirst().getQuantitaDisponibile());
+    }
+
+    @Test
+    void addCarteAcquistoTestKO(){
+
+        var request = new AddAcquistoCarteRequest("ETB evoluzioni a paldea", LocalDateTime.now().minusHours(1),71.00,3,"Carrefout",
+                null,"pokemon","sealed",false,"evlprsm123");
+
+        var exception = Assertions.assertThrows(TsmDbException.class, () -> {
+
+           addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+        });
+
+        Assertions.assertEquals("Error on addAcquistoCarte service",exception.getMsg());
+
+        var inventario = inventarioCarteRepo.findByNomeAcquisto(request.nomeAcquisto());
+
+        Assertions.assertTrue(inventario.isEmpty());
     }
 }

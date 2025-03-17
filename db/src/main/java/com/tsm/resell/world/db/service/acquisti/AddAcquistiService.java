@@ -12,12 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.StructuredTaskScope;
 
 @Service
 @Slf4j
@@ -27,6 +29,7 @@ public class AddAcquistiService {
     private final AcquistiCarteRepo acquistiCarteRepo;
     private final InventarioCarteRepo inventarioCarteRepo;
     private final TsmDbUtils tsmDbUtils;
+    private final TransactionTemplate transactionTemplate;
 
     @Transactional
     public CarteAcquisto addAcquistoCarte(AddAcquistoCarteRequest request, HttpHeaders header){
@@ -43,21 +46,28 @@ public class AddAcquistiService {
         // addo trxId acquisto
         entity.setCodiceAcquisto(acquistoTrxId);
         // lancio su thread virtuale
-        try(var scope =  Executors.newVirtualThreadPerTaskExecutor()) {
+        //TODO: controllare se gestisce transazionalita, ok non gestisce la transazione, scoprire come fare
+        try(var scope =  new StructuredTaskScope.ShutdownOnFailure()) {
             // chiamata su thread virtuale per add inventario, l'execute torna sempre void
-            scope.execute(() -> addInventario(requestId, request.nomeAcquisto(), acquistoTrxId, request.quantitaAcquistata()));
-            // chiamata a add acquisto carte repo, uso submit perche ho bisogno del valore
-            var resp = scope.submit(() -> acquistiCarteRepo.save(entity)).get();
+            scope.fork(() -> transactionTemplate.execute(i -> {
+                addInventario(requestId, request.nomeAcquisto(), acquistoTrxId, request.quantitaAcquistata());
+                return i;
+            }));
+            // Execute save in the main transaction
+            var resp = scope.fork(() -> transactionTemplate.execute(i -> acquistiCarteRepo.save(entity))).get();
+
+            scope.join().throwIfFailed();
             log.info("AddAcquistoCarte service ended successfully for requestId: {}", resp);
             return resp;
 
         }catch (Exception e){
             log.error("Error on addAcquistoCarte service with err: {}",e.getMessage());
+            //Thread.currentThread().interrupt();
             throw new TsmDbException("Error on addAcquistoCarte service","05");
         }
     }
 
-
+    @Transactional
     private void addInventario(String requestId, String nomeAcquisto,String codiceAcquisto, Integer quantitaAcquistata){
         log.info("Addinventario started for requestId : {}",requestId);
 
