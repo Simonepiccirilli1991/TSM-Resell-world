@@ -4,6 +4,10 @@ import com.tsm.resell.world.db.entity.CarteVendita;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface VenditaCarteRepo extends JpaRepository<CarteVendita,Integer> {
+
+    Optional<CarteVendita> findByCodiceVendita(String codiceVendita);
 }

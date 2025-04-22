@@ -4,6 +4,7 @@ import com.tsm.resell.world.db.entity.CarteAcquisto;
 import com.tsm.resell.world.db.model.request.acquisti.GetAcquistiRequest;
 import com.tsm.resell.world.db.model.response.acquisti.GetAcquistiResponse;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ public class GetAcquistiService {
     private final AcquistiCarteRepo acquistiCarteRepo;
 
 
+    @Transactional
     public GetAcquistiResponse getCarteAcquisto(GetAcquistiRequest request, HttpHeaders headers){
         var tracingId = (!ObjectUtils.isEmpty(headers.getFirst("tracingId")) ? headers.getFirst("tracingId") : UUID.randomUUID());
         log.info("GetCarteAcquisto service started with request: {} , and TracingId: {}",request,tracingId);

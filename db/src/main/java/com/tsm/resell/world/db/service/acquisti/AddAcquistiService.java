@@ -7,11 +7,11 @@ import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import com.tsm.resell.world.db.repository.InventarioCarteRepo;
 import com.tsm.resell.world.db.util.TsmDbUtils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ObjectUtils;
 
@@ -19,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.Executors;
-import java.util.concurrent.StructuredTaskScope;
 
 @Service
 @Slf4j
@@ -29,7 +28,6 @@ public class AddAcquistiService {
     private final AcquistiCarteRepo acquistiCarteRepo;
     private final InventarioCarteRepo inventarioCarteRepo;
     private final TsmDbUtils tsmDbUtils;
-    private final TransactionTemplate transactionTemplate;
 
     @Transactional
     public CarteAcquisto addAcquistoCarte(AddAcquistoCarteRequest request, HttpHeaders header){
@@ -46,17 +44,11 @@ public class AddAcquistiService {
         // addo trxId acquisto
         entity.setCodiceAcquisto(acquistoTrxId);
         // lancio su thread virtuale
-        //TODO: controllare se gestisce transazionalita, ok non gestisce la transazione, scoprire come fare
-        try(var scope =  new StructuredTaskScope.ShutdownOnFailure()) {
-            // chiamata su thread virtuale per add inventario, l'execute torna sempre void
-            scope.fork(() -> transactionTemplate.execute(i -> {
-                addInventario(requestId, request.nomeAcquisto(), acquistoTrxId, request.quantitaAcquistata());
-                return i;
-            }));
-            // Execute save in the main transaction
-            var resp = scope.fork(() -> transactionTemplate.execute(i -> acquistiCarteRepo.save(entity))).get();
-
-            scope.join().throwIfFailed();
+        try {
+            // chiamata a add acquisto carte repo
+            addInventario(requestId, request.nomeAcquisto(), acquistoTrxId, request.quantitaAcquistata());
+            // salvo entity direttamente qui per transazionalità
+            var resp = acquistiCarteRepo.save(entity);
             log.info("AddAcquistoCarte service ended successfully for requestId: {}", resp);
             return resp;
 
@@ -67,7 +59,7 @@ public class AddAcquistiService {
         }
     }
 
-    @Transactional
+
     private void addInventario(String requestId, String nomeAcquisto,String codiceAcquisto, Integer quantitaAcquistata){
         log.info("Addinventario started for requestId : {}",requestId);
 

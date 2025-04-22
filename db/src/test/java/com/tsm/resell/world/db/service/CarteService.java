@@ -8,10 +8,7 @@ import com.tsm.resell.world.db.model.request.acquisti.UpdateAcquistiCarteRequest
 import com.tsm.resell.world.db.model.request.inventario.GetInventarioRequest;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import com.tsm.resell.world.db.repository.InventarioCarteRepo;
-import com.tsm.resell.world.db.service.acquisti.AddAcquistiService;
-import com.tsm.resell.world.db.service.acquisti.DeleteAcquistiService;
-import com.tsm.resell.world.db.service.acquisti.GetAcquistiService;
-import com.tsm.resell.world.db.service.acquisti.UpdateAcquistiService;
+import com.tsm.resell.world.db.service.acquisti.*;
 import com.tsm.resell.world.db.service.inventario.GetInventarioCarteService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -27,16 +24,9 @@ public class CarteService {
 
     // service
     @Autowired
-    AddAcquistiService addAcquistiService;
-    @Autowired
-    GetAcquistiService getAcquistiService;
+    AcquistiWrapperService acquistiWrapperService;
     @Autowired
     GetInventarioCarteService getInventarioCarteService;
-    @Autowired
-    DeleteAcquistiService deleteAcquistiService;
-    @Autowired
-    UpdateAcquistiService updateAcquistiService;
-
     // repo
     @Autowired
     AcquistiCarteRepo acquistiCarteRepo;
@@ -58,7 +48,7 @@ public class CarteService {
 
         var headers = new HttpHeaders();
         headers.add("requestId","asd1234");
-        var resp = addAcquistiService.addAcquistoCarte(request,headers);
+        var resp = acquistiWrapperService.addAcquisto(request,headers);
 
         Assertions.assertEquals("ETB scintille folgoranti",resp.getNomeAcquisto());
         Assertions.assertEquals(122.00,resp.getCostoTotaleAcquisto());
@@ -70,12 +60,12 @@ public class CarteService {
         var request = new AddAcquistoCarteRequest("ETB evoluzioni prismatiche", LocalDateTime.now(),61.00,2,"Carrefout",
                 "evoluzioni prismatiche","pokemon","sealed",false,"evlprsm123");
 
-        var resp = addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+        var resp = acquistiWrapperService.addAcquisto(request,new HttpHeaders());
 
         Assertions.assertEquals("ETB evoluzioni prismatiche",resp.getNomeAcquisto());
 
         var iRequest = new GetAcquistiRequest("ETB evoluzioni prismatiche",null,null,null);
-        var iResp = getAcquistiService.getCarteAcquisto(iRequest,new HttpHeaders());
+        var iResp = acquistiWrapperService.getAcquisti(iRequest,new HttpHeaders());
 
         System.out.print(iResp);
         Assertions.assertEquals(122.00,iResp.listaAcquisti().getFirst().getCostoTotaleAcquisto());
@@ -87,7 +77,7 @@ public class CarteService {
         var request = new AddAcquistoCarteRequest("ETB destino di paldea", LocalDateTime.now(),61.00,1,"Carrefout",
                 "destino di paldea","pokemon","sealed",false,"evlprsm123");
 
-        var resp = addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+        var resp = acquistiWrapperService.addAcquisto(request,new HttpHeaders());
 
         Assertions.assertEquals("ETB destino di paldea",resp.getNomeAcquisto());
 
@@ -104,12 +94,12 @@ public class CarteService {
         var request = new AddAcquistoCarteRequest("ETB destino sfuggente", LocalDateTime.now().minusHours(1),71.00,3,"Carrefout",
                 "destino sfuggente","pokemon","sealed",false,"evlprsm123");
 
-        addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+        acquistiWrapperService.addAcquisto(request,new HttpHeaders());
 
         var iRequest = new AddAcquistoCarteRequest("ETB destino sfuggente", LocalDateTime.now(),54.00,2,"Carrefout",
                 "destino sfuggente","pokemon","sealed",false,"evlprsm123");
 
-        var resp = addAcquistiService.addAcquistoCarte(iRequest,new HttpHeaders());
+        var resp = acquistiWrapperService.addAcquisto(iRequest,new HttpHeaders());
 
         var iRequestF = new GetInventarioRequest(iRequest.nomeAcquisto(),null,null);
         // ttesto calcolo corretto
@@ -118,7 +108,7 @@ public class CarteService {
         Assertions.assertEquals(5,iResp.inventario().getFirst().getQuantitaDisponibile());
 
         // test Delete acquisto
-        deleteAcquistiService.deleteAcquistoCarte(resp.getCodiceAcquisto(),new HttpHeaders());
+        acquistiWrapperService.deleteAcquisto(resp.getCodiceAcquisto(),new HttpHeaders());
 
         var iResp2 = getInventarioCarteService.getInventarioCarte(iRequestF,new HttpHeaders());
 
@@ -132,12 +122,12 @@ public class CarteService {
         var request = new AddAcquistoCarteRequest("ETB evoluzioni a paldea", LocalDateTime.now().minusHours(1),71.00,3,"Carrefout",
                 "destino sfuggente","pokemon","sealed",false,"evlprsm123");
 
-        var resp = addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+        var resp = acquistiWrapperService.addAcquisto(request,new HttpHeaders());
 
         Assertions.assertEquals("ETB evoluzioni a paldea",resp.getNomeAcquisto());
 
         var iRequest = new GetAcquistiRequest(null, resp.getCodiceAcquisto(), null,null);
-        var iResp = getAcquistiService.getCarteAcquisto(iRequest,new HttpHeaders());
+        var iResp = acquistiWrapperService.getAcquisti(iRequest,new HttpHeaders());
 
         Assertions.assertEquals(3,iResp.listaAcquisti().getFirst().getQuantitaAcquistata());
 
@@ -152,7 +142,7 @@ public class CarteService {
         // vado di udpate e richecko dopo
         var iUpdateRequest = new UpdateAcquistiCarteRequest(resp.getCodiceAcquisto(), updateRequest);
 
-        var finalResp = updateAcquistiService.updateCarteAcquisto(iUpdateRequest,new HttpHeaders());
+        var finalResp = acquistiWrapperService.updateAcquisto(iUpdateRequest,new HttpHeaders());
 
         Assertions.assertEquals(5,finalResp.getQuantitaAcquistata());
         Assertions.assertEquals(250.00,finalResp.getCostoTotaleAcquisto());
@@ -170,7 +160,7 @@ public class CarteService {
 
         var exception = Assertions.assertThrows(TsmDbException.class, () -> {
 
-           addAcquistiService.addAcquistoCarte(request,new HttpHeaders());
+            acquistiWrapperService.addAcquisto(request,new HttpHeaders());
         });
 
         Assertions.assertEquals("Error on addAcquistoCarte service",exception.getMsg());

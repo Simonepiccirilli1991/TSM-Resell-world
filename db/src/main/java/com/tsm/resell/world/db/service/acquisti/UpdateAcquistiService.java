@@ -6,11 +6,11 @@ import com.tsm.resell.world.db.model.request.acquisti.AddAcquistoCarteRequest;
 import com.tsm.resell.world.db.model.request.acquisti.UpdateAcquistiCarteRequest;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import com.tsm.resell.world.db.repository.InventarioCarteRepo;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.time.format.DateTimeFormatter;

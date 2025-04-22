@@ -4,16 +4,14 @@ import com.tsm.resell.world.db.exception.TsmDbException;
 import com.tsm.resell.world.db.model.response.BaseResponse;
 import com.tsm.resell.world.db.repository.AcquistiCarteRepo;
 import com.tsm.resell.world.db.repository.InventarioCarteRepo;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.StructuredTaskScope;
 
 @Service
 @Slf4j
@@ -36,19 +34,12 @@ public class DeleteAcquistiService {
                     return new TsmDbException("Missing entity","04");
                 });
         // faccio in pallelo, ma non va di default su thread virtuale, imposto io abilitando i thrad virtuali su application yml
-        try(var scope = new StructuredTaskScope.ShutdownOnFailure()){
+        try{
             // deleto acquisto
-            scope.fork(() -> {
-                acquistiCarteRepo.delete(entity);
-                return null;
-            });
+            acquistiCarteRepo.delete(entity);
             // storno inventario
-            scope.fork(() ->{
-                aggiustaInventarioOnDelete(entity.getNomeAcquisto(),entity.getCodiceAcquisto(),entity.getQuantitaAcquistata());
-                return null;
-            });
+            aggiustaInventarioOnDelete(entity.getNomeAcquisto(),entity.getCodiceAcquisto(),entity.getQuantitaAcquistata());
             // joino e lancio eccezzione se 1 dei 2 fallisce con relativo rollback
-            scope.join().throwIfFailed();
         }catch (Exception e){
             log.error("Error on deleteAcquistoCarte service with error: {}",e.getMessage());
             throw new TsmDbException("Error on deleteAcquistoCarta service with err: "+e.getMessage(),"03");

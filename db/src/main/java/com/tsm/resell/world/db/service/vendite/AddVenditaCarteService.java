@@ -58,18 +58,14 @@ public class AddVenditaCarteService {
 
         // uso queste perche il thread virtuale non gestisce e non eredita la transazionalità dal thread principale
         // devo salvare entity e settare la parte inventario
-        try(var scope = new StructuredTaskScope.ShutdownOnFailure()){
+        try{
             // chiamata per salvare a db
-            var resp = scope.fork(() -> venditaCarteRepo.save(entityVendita));
+            var resp =  venditaCarteRepo.save(entityVendita);
             // chiamata per salvare inventario
-            scope.fork(() -> {
-                addVenditaInventario(codiceVendita,request.nomeCarte(), request.quantitaVendita());
-                return null;
-            });
+            addVenditaInventario(codiceVendita,request.nomeCarte(), request.quantitaVendita());
 
-            scope.join().throwIfFailed();
             log.info("AddCarteVendita service ended successfully, tracingId: {}");
-            return resp.get();
+            return resp;
 
         }catch (Exception e){
             log.error("Error on addCarteVenditaService with error: {}",e.getMessage());
