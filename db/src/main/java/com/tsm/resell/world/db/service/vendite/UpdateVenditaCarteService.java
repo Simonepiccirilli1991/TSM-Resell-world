@@ -71,15 +71,15 @@ public class UpdateVenditaCarteService {
         var speseVenditaOriginale = entity.getSpeseVendita();
 
         // controllo prima il prezzo
-        if(prezzoVenditaOriginale.equals(newPrezzoVendita) && !ObjectUtils.isEmpty(newPrezzoVendita))
+        if(!prezzoVenditaOriginale.equals(newPrezzoVendita) && !ObjectUtils.isEmpty(newPrezzoVendita))
             entity.setPrezzoVendita(newPrezzoVendita);
 
         //controllo le spese
-        if(speseVenditaOriginale.equals(newSpeseVendita) && !ObjectUtils.isEmpty(newSpeseVendita))
+        if(!speseVenditaOriginale.equals(newSpeseVendita) && !ObjectUtils.isEmpty(newSpeseVendita))
             entity.setSpeseVendita(newSpeseVendita);
 
         // controllo quantita
-        if(quanitaVenditaOriginale.equals(newQuantitaVendita) && !ObjectUtils.isEmpty(newQuantitaVendita)) {
+        if(!quanitaVenditaOriginale.equals(newQuantitaVendita) && !ObjectUtils.isEmpty(newQuantitaVendita)) {
             entity.setQuantitaVendita(newQuantitaVendita);
 
             // devo aggiornare inventario

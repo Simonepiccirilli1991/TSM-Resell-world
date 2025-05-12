@@ -88,7 +88,10 @@ public class AddVenditaCarteService {
         inventario.getCodiciAcquisti().add(codiceVendita);
         var updateDisponibile = inventario.getQuantitaDisponibile() - quantitaVenduta;
         inventario.setQuantitaDisponibile(updateDisponibile);
+        // calcolo quantita venduta
+        var updateQuantitaVenduta = (!ObjectUtils.isEmpty(inventario.getQuantitaVendute())) ? inventario.getQuantitaVendute() + quantitaVenduta : quantitaVenduta;
 
+        inventario.setQuantitaVendute(updateQuantitaVenduta);
         inventarioCarteRepo.save(inventario);
     }
 }

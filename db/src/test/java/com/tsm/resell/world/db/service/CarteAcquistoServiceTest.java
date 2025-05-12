@@ -20,7 +20,7 @@ import org.springframework.http.HttpHeaders;
 import java.time.LocalDateTime;
 
 @SpringBootTest
-public class CarteService {
+public class CarteAcquistoServiceTest {
 
     // service
     @Autowired

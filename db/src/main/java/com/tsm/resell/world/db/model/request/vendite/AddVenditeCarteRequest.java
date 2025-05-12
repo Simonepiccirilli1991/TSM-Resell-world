@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record AddVenditeCarteRequest(String nomeCarte, String tcgCardGame, String condizioniCarta, String espansione, LocalDateTime dataVendita,
                                      Double prezzoVendita, Integer quantitaVendita, String piattaformaVendita, String codice,
-                                     Double speseVendita, String chiaveAcqusito) {
+                                     Double speseVendita, String chiaveAcqusito, Boolean setSpeciale) {
 
     //ritorna true se non e valido
     public Boolean validateUpdateVenditaRequest(){
