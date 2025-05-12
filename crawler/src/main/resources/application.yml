@@ -1,0 +1,5 @@
+spring:
+  application.name: TSM resell word crawler
+
+  threads:
+    virtual.enabled: true
