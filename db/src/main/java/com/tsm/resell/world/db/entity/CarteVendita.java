@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
-@Entity(name = "carteVemdita")
+@Entity(name = "carte_vendita")
 public class CarteVendita extends Vendita {
 
     @Id

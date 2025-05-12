@@ -2,6 +2,7 @@ package com.tsm.resell.world.db.controller;
 
 import com.tsm.resell.world.db.entity.CarteVendita;
 import com.tsm.resell.world.db.model.request.vendite.AddVenditeCarteRequest;
+import com.tsm.resell.world.db.model.request.vendite.GetVenditaCarteRequest;
 import com.tsm.resell.world.db.model.request.vendite.UpdateVenditaCarteRequest;
 import com.tsm.resell.world.db.model.response.BaseResponse;
 import com.tsm.resell.world.db.service.vendite.VenditaWrapperService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/carte/vendite")
@@ -33,5 +36,10 @@ public class VenditeCarteController {
     @PatchMapping("update")
     public Mono<ResponseEntity<CarteVendita>> updateVenditaCarte(@RequestBody UpdateVenditaCarteRequest request, @RequestHeader HttpHeaders headers){
         return Mono.just(ResponseEntity.ok(venditaWrapperService.updateCarteVendita(request, headers)));
+    }
+
+    @PostMapping("get")
+    public Mono<ResponseEntity<List<CarteVendita>>> getFilterCarteVendita(@RequestBody GetVenditaCarteRequest request,@RequestHeader HttpHeaders headers){
+        return Mono.just(ResponseEntity.ok(venditaWrapperService.getCartevendita(request, headers)));
     }
 }
